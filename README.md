@@ -19,49 +19,35 @@ Cette plateforme de monitoring DevOps simule et permet :
 ## 🧱 Architecture du Système
 
 ```mermaid
-                          ┌──────────────────────────┐
-                          │        Developer         │
-                          │   (push / PR GitHub)     │
-                          └────────────┬─────────────┘
-                                       │
-                                       ▼
-                          ┌──────────────────────────┐
-                          │         GitHub           │
-                          │  Source Code Repository  │
-                          └────────────┬─────────────┘
-                                       │
-                                       ▼
-                ┌─────────────────────────────────────────┐
-                │          GitHub Actions (CI/CD)         │
-                ├─────────────────────────────────────────┤
-                │ ✔ Lint (flake8)                        │
-                │ ✔ Unit Tests (pytest)                  │
-                │ ✔ Coverage ≥ 75%                       │
-                │ ✔ Security Scan (Trivy)               │
-                └───────────────┬─────────────────────────┘
-                                │
-                                ▼
-                ┌─────────────────────────────────────────┐
-                │         Docker Image Build              │
-                ├─────────────────────────────────────────┤
-                │ FastAPI Backend Image               │
-                │ Streamlit Dashboard Image           │
-                └───────────────┬─────────────────────────┘
-                                │
-                                ▼
-                ┌─────────────────────────────────────────┐
-                │      Docker Compose Runtime            │
-                ├─────────────────────────────────────────┤
-                │ API Service (FastAPI :8000)            │
-                │ Dashboard (Streamlit :8501)            │
-                │ Internal Network Communication         │
-                └───────────────┬─────────────────────────┘
-                                │
-                                ▼
-                ┌─────────────────────────────────────────┐
-                │     Local / Cloud Deployment Ready     │
-                │  (Docker / VM / Kubernetes future)     │
-                └─────────────────────────────────────────┘
+graph TD
+    Dev["Developer <br/> (push / PR GitHub)"] -->|Git Push| GH["GitHub Repository"]
+    GH -->|Trigger| Actions["GitHub Actions (CI/CD)"]
+    
+    subgraph CI_CD["CI/CD Pipeline"]
+        Actions --> Lint["✔ Lint (flake8)"]
+        Actions --> Tests["✔ Unit Tests (pytest)"]
+        Actions --> Cov["✔ Coverage >= 75%"]
+        Actions --> Security["✔ Security Scan (Trivy)"]
+    end
+    
+    Cov --> Build["Docker Image Build"]
+    Security --> Build
+    
+    subgraph Docker_Images["Docker Images"]
+        Build --> API_Img["🐳 FastAPI Backend Image"]
+        Build --> Dash_Img["🐳 Streamlit Dashboard Image"]
+    end
+    
+    API_Img --> Compose["Docker Compose Runtime"]
+    Dash_Img --> Compose
+    
+    subgraph Runtime_Stack["Runtime Stack"]
+        Compose --> Service_API["API Service <br/> (FastAPI :8000)"]
+        Compose --> Service_Dash["Dashboard <br/> (Streamlit :8501)"]
+        Service_API <-->|Internal Network| Service_Dash
+    end
+    
+    Compose --> Deploy["Local / Cloud Ready"]
 ```
 
 ---
