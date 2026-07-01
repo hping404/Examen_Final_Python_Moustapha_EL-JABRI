@@ -19,7 +19,49 @@ Cette plateforme de monitoring DevOps simule et permet :
 ## 🧱 Architecture du Système
 
 ```mermaid
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/4dcbe960-c972-456f-b61e-5176fa35a438" />
+                          ┌──────────────────────────┐
+                          │        Developer         │
+                          │   (push / PR GitHub)     │
+                          └────────────┬─────────────┘
+                                       │
+                                       ▼
+                          ┌──────────────────────────┐
+                          │         GitHub           │
+                          │  Source Code Repository  │
+                          └────────────┬─────────────┘
+                                       │
+                                       ▼
+                ┌─────────────────────────────────────────┐
+                │          GitHub Actions (CI/CD)         │
+                ├─────────────────────────────────────────┤
+                │ ✔ Lint (flake8)                        │
+                │ ✔ Unit Tests (pytest)                  │
+                │ ✔ Coverage ≥ 75%                       │
+                │ ✔ Security Scan (Trivy)               │
+                └───────────────┬─────────────────────────┘
+                                │
+                                ▼
+                ┌─────────────────────────────────────────┐
+                │         Docker Image Build              │
+                ├─────────────────────────────────────────┤
+                │ FastAPI Backend Image               │
+                │ Streamlit Dashboard Image           │
+                └───────────────┬─────────────────────────┘
+                                │
+                                ▼
+                ┌─────────────────────────────────────────┐
+                │      Docker Compose Runtime            │
+                ├─────────────────────────────────────────┤
+                │ API Service (FastAPI :8000)            │
+                │ Dashboard (Streamlit :8501)            │
+                │ Internal Network Communication         │
+                └───────────────┬─────────────────────────┘
+                                │
+                                ▼
+                ┌─────────────────────────────────────────┐
+                │     Local / Cloud Deployment Ready     │
+                │  (Docker / VM / Kubernetes future)     │
+                └─────────────────────────────────────────┘
 ```
 
 ---
